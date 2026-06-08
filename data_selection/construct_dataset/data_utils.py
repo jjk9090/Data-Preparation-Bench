@@ -1,3 +1,5 @@
+import re
+
 def get_option_label(index):
     return chr(65 + index)
 
@@ -35,6 +37,35 @@ def format_pubmedqa_input(data):
 def format_natural_reasoning_finance_output(data):
     return data["response"]
 
+
+def format_finance_slm_distillation_data_system(data):
+    pattern = r'<\|im_start\|>system\n(.*?)\n<\|im_end\|>'
+    match = re.search(pattern, data, re.DOTALL)
+
+    if match:
+        system_content = match.group(1)
+        return system_content.strip()
+    else:
+        return ""
+
+def format_huatuo_encyclopedia_qa_instruction(data):
+    if isinstance(data, list):
+        return data[0][0]
+    return data
+
+def format_huatuo_encyclopedia_qa_output(data):
+    return data[0]
+
+def format_canadian_tax_law_qa_instruction(data):
+    inst_match = re.search(r'\[INST\](.*?)\[/INST\]', data, re.DOTALL)
+    instruction = inst_match.group(1).strip() if inst_match else ""
+    return instruction
+    
+def format_canadian_tax_law_qa_output(data):
+    output_match = re.search(r'\[/INST\](.*?)</s>', data, re.DOTALL)
+    output = output_match.group(1).strip() if output_match else ""
+    return output
+    
 FORMAT_REGISTRY = {
     "format_MathMC_options": format_MathMC_options,
     "format_WildSci_options": format_WildSci_options,
@@ -43,6 +74,11 @@ FORMAT_REGISTRY = {
     "format_sciq_options": format_sciq_options,
     "format_pubmedqa_input": format_pubmedqa_input,
     "format_natural_reasoning_finance_output": format_natural_reasoning_finance_output,
+    "format_finance_slm_distillation_data_system": format_finance_slm_distillation_data_system,
+    "format_huatuo_encyclopedia_qa_instruction": format_huatuo_encyclopedia_qa_instruction,
+    "format_huatuo_encyclopedia_qa_output": format_huatuo_encyclopedia_qa_output,
+    "format_canadian_tax_law_qa_instruction": format_canadian_tax_law_qa_instruction,
+    "format_canadian_tax_law_qa_output": format_canadian_tax_law_qa_output,
 }
 
 def apply_formatters(example, config):
@@ -60,6 +96,7 @@ def filter_WildSci(example):
 
 def filter_ScienceQA(example):
     return 'image' not in example or not example['image'] 
+
 
 FILTER_REGISTRY = {
     "filter_WildSci": filter_WildSci,

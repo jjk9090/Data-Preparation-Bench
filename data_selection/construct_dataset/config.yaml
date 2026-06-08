@@ -1,6 +1,3 @@
-global_sampling:
-  sizes: 1000
-
 domains:
   math:
     datasets:
@@ -47,7 +44,6 @@ domains:
         mapping: {instruction: "problem", output: "generation"}
       - name: "nlile/24-game"
         split: "train"
-        system_prompt: "你是一个24点专家，根据给的数字卡牌，给出如何得到24的方案"
         mapping: {instruction: "numbers", output: "solutions"}
       - name: "SallyTan/MathMC"
         split: "train"
@@ -158,6 +154,7 @@ domains:
       - name: "nri-ai/nri-fin-reasoning"
         format: "sharegpt"
         split: "train"
+        language: "japanese"
         mapping: 
           messages: "messages"
       - name: "neoyipeng/natural_reasoning_finance"
@@ -171,13 +168,14 @@ domains:
       - name: "sujet-ai/Sujet-Finance-Instruct-177k"
         split: "train"
         mapping: 
-          system_prompt: "system_prompt"
+          system: "system_prompt"
           instruction: "user_prompt"
           input: "inputs"
           output: "answer"
       - name: "BAAI/IndustryInstruction_Finance-Economics"
         format: "sharegpt"
         split: "train"
+        language: "chinese"
         mapping: 
           messages: "conversations"
           from: "from"
@@ -188,45 +186,60 @@ domains:
         split: "train"
         mapping: {instruction: "instruction", output: "output"}
       - name: "jdecim/pit-earnings-call-qa"
+        subsets: ["202112", "202212"]
         split: "train"
         mapping: {instruction: "question", input: "context", output: "answer"}
       - name: "Infiniaai/eu-financial-regulatory-qa"
-        format: "sharegpt"
+        subsets: ["prompt_completion"]
         split: "train"
-        mapping: 
-          messages: "messages"
-          from: "role"
-          system: "system"
-          user: "user"
-          content: "content"
-          assistant: "assistant"
+        mapping: {instruction: "prompt", output: "completion"}
       - name: "Ayansk11/FinSenti-Dataset"
+        subsets: ["sft"]
         split: "sft_train.jsonl"
         mapping: {instruction: "instruction", input: "input", output: "output"}
       - name: "ash0t/finance-slm-distillation-data"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: 
+          system: "text"
+          instruction: "instruction"
+          output: "think"
+        formatters:
+          system: "format_finance_slm_distillation_data_system"
       - name: "tahamajs/bitcoin-sllm-instruct"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "instruction", input: "input", output: "output"}
       - name: "OpenDataArena/ODA-Fin-SFT-318k"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "instruction", input: "input", output: "output"}
       - name: "nvidia/Nemotron-SpecializedDomains-Finance-v1"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: 
+          messages: "messages"
+          system: "system"
+          from: "role"
+          user: "user"
+          content: "content"
+          assistant: "assistant"
+          assistant_content: "reasoning_content"
       - name: "ckerf/arb-instruct-v1"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
-      - name: "uaytug/fumea-dataset"
+        mapping: {instruction: "instruction", input: "input", output: "output"}
+      - name: "Akhil-Theerthala/Kuvera-PersonalFinance-V2.1"
         split: "train"
-        mapping: {instruction: "text", output: "label"}
-      - name: "Akhil-Theerthala/PersonalFinance_v2"
+        mapping: {instruction: "query", output: ["chain_of_thought", "response"]}
+      - name: "oyi77/berkahkarya-id-finance-dataset"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
-      - name: "Akhil-Theerthala/PersonalFinance-CoTR-V2-Compact"
+        language: "indonesian"
+        mapping: 
+          messages: "messages"
+      - name: "LYMQY/UCI_sft_3000"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "chinese"
+        mapping: 
+          messages: "messages"
+      - name: "BradNLP/ReTAS"
+        split: "train"
+        mapping: {instruction: "prompt", output: "response"}
 
   medical:
     datasets:
@@ -240,121 +253,141 @@ domains:
           input: "format_PubMedQA_input"
       - name: "FreedomIntelligence/medical-o1-reasoning-SFT"
         split: "train"
-        mapping: {instruction: "question", output: "reasoning"}
+        mapping: {instruction: "Question", output: ["Complex_CoT", "Response"]}
       - name: "FreedomIntelligence/Medical-R1-Distill-Data"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "question", output: ["reasoning (reasoning_content)", "response (content)"]}
       - name: "MohamedISSAOUI/fertility-medical-reasoning"
         split: "train"
-        mapping: {instruction: "problem", output: "solution"}
+        mapping: {instruction: "question", output: ["reasoning", "answer"]}
       - name: "mattwesney/CoT_Rare-Diseases_And_Health-Conditions"
         split: "train"
-        mapping: {instruction: "question", output: "reasoning"}
+        mapping: {instruction: "question", output: "answer"}
       - name: "OpenMed/Medical-Reasoning-SFT-GPT-OSS-120B"
         split: "train"
-        mapping: {instruction: "question", output: "solution"}
+        mapping: 
+          messages: "messages"
       - name: "CrossNow/Medical-Reasoning-SFT-Mega"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: 
+          messages: "messages"
       - name: "FreedomIntelligence/Huatuo26M-Lite"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "question", output: "answer"}
       - name: "FreedomIntelligence/huatuo_encyclopedia_qa"
         split: "train"
-        mapping: {instruction: "question", output: "answer"}
-      - name: "qiaojin/PubMedQA"
-        split: "train"
-        mapping: {instruction: "question", output: "final_decision"}
+        mapping: {instruction: "questions", output: "answers"}
+        formatters:
+          instruction: "format_huatuo_encyclopedia_qa_instruction"
+          output: "format_huatuo_encyclopedia_qa_output"
       - name: "huzaifa525/Medical_Intelligence_Dataset_76k_2026_Edition"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "input", output: "output"}
       - name: "RecurvAI/Recurv-Medical-Dataset"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "input", output: "output"}
       - name: "Amod/mental_health_counseling_conversations"
         split: "train"
         mapping: {instruction: "Context", output: "Response"}
       - name: "mattwesney/CoT_Reasoning_First_Responders_Triage_And_Emergencies"
         split: "train"
-        mapping: {instruction: "question", output: "reasoning"}
+        mapping: {instruction: "question", output: "answer"}
       - name: "169Pi/medical_psychology"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "prompt", output: ["complex_cot", "response"]}
       - name: "ZombitX64/Medical-o1-Reasoning-SFT-Thai"
+        language: "thai"
         split: "train"
-        mapping: {instruction: "question", output: "reasoning"}
+        mapping: {instruction: "Question", output: ["Complex_CoT", "Response"]}
       - name: "quannguyen204/medical_sft_crawl_vi_10k_v1"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "vietnamese"
+        mapping: 
+          messages: "messages"
       - name: "anisha2102/RaR-Medicine"
         split: "train"
-        mapping: {instruction: "question", output: "answer"}
+        mapping: {instruction: "question", output: "reference_answer"}
       - name: "UCSC-VLAA/m23k-tokenized"
         split: "train"
-        mapping: {instruction: "text", output: "label"}
-
+        mapping: 
+          system: "text"
+          instruction: "prompt"
+          output: "reasoning"
+      - name: "bio-nlp-umass/bioinstruct"
+        split: "train"
+        mapping: {instruction: "question", input: "input", output: "output"}
+  
   law:
     datasets:
       - name: "Gregorgramtoshi/us-law-qa-dataset"
         split: "train"
         mapping: {instruction: "question", output: "answer"}
-      - name: "joecwales/whiteglove-legal-2026"
-        split: "train"
-        mapping: {instruction: "instruction", output: "output"}
       - name: "arcolab-dev/us-caselaw-legal-reasoning-cot-preview"
         split: "train"
-        mapping: {instruction: "problem", output: "solution"}
+        mapping: {instruction: "instruction", output: ["thought", "output"]}
       - name: "lawinstruct/lawinstruct"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "multilingual"
+        mapping: {instruction: "instruction", input: "prompt", output: "answer"}
       - name: "nshportun/usa-immigration-law-qa"
         split: "train"
         mapping: {instruction: "question", output: "answer"}
       - name: "Aiiluo/Chinese-Law-SFT-Dataset"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "chinese"
+        mapping: {instruction: "input", output: "output"}
       - name: "169Pi/indian_law"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
-      - name: "kaushik-harsh-99/Indian-legal-data-v2"
-        split: "train"
-        mapping: {instruction: "question", output: "answer"}
+        mapping: {instruction: "prompt", output: ["complex_cot", "response"]}
       - name: "kaushik-harsh-99/Indian-legal-data-v3"
         split: "train"
-        mapping: {instruction: "question", output: "answer"}
+        language: ["marathi", "english"]
+        mapping: 
+          messages: "messages"
+          thought: "thought"
       - name: "aditya-datasets/marathi-land-law-reasoning"
         split: "train"
         mapping: {instruction: "problem", output: "solution"}
       - name: "jihye-moon/LawQA-Ko"
         split: "train"
+        language: "korean"
         mapping: {instruction: "question", output: "answer"}
       - name: "OrionCAF/turkish_law_qa_dataset"
         split: "train"
+        language: "turkish"
         mapping: {instruction: "question", output: "answer"}
       - name: "ntphuc149/ViBidLQA_v1"
         split: "train"
-        mapping: {instruction: "question", output: "answer"}
+        language: "vietnamese"
+        mapping: {instruction: "question", input: "context", output: "answer"}
       - name: "chhatramani/nepal_5_law_RAG_QA"
         split: "train"
-        mapping: {instruction: "question", output: "answer"}
+        language: ["nepali", "english"]
+        mapping: {instruction: "instruction", input: "input", output: "output"}
       - name: "Shifaur/sri_lanka_constitutional_law_qa"
         split: "train"
         mapping: {instruction: "question", output: "answer"}
       - name: "tarekys5/egyptian_legal_v2"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "arabic"
+        mapping: {instruction: "instruction", input: "input", output: "output"}
       - name: "Omar-youssef/QA_LAW_Egyptian_dataset"
         split: "train"
+        language: "arabic"
         mapping: {instruction: "question", output: "answer"}
       - name: "VinceGx33/mistral-legal-french-dataset"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "french"
+        mapping: 
+          messages: "messages"
       - name: "celsowm/legal_br_sft"
         split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        language: "portuguese"
+        mapping: 
+          messages: "messages"
       - name: "Christine-HiAiPerf/canadian-tax-law-qa"
         split: "train"
-        mapping: {instruction: "question", output: "answer"}
-      - name: "gydou/DeonticBench"
-        split: "train"
-        mapping: {instruction: "instruction", output: "output"}
+        mapping: {instruction: "text", output: "text"}
+        formatters:
+          instruction: "format_canadian_tax_law_qa_instruction"
+          output: "format_canadian_tax_law_qa_output"
